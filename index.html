@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./css/style.css" type="text/css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.js"></script>
+
+    <title>Document</title>
+</head>
+<body>
+<h3>Please Enter the Numbers between -50 to 50</h3>
+<form id="form">
+    <fieldset>
+        <legend>Validating a complete form</legend>
+        <div class="flex mr-30 w-100">
+            <div class="flex-grow-1 inputContainer">
+                <label for="num1">Horizontal Number: From</label>
+                <div>
+                    <input type="number" name="num1" id="num1" required data-id="num1Slider">
+                    <label id="num1-error" class="error" for="num1"></label>
+                    <div class="num1Slider" data-id="num1"></div>
+                </div>
+                <label for="num2">to</label>
+                <div>
+                    <input type="number" name="num2" id="num2" required data-id="num2Slider">
+                    <label id="num2-error" class="error" for="num2"></label>
+                    <div class="num2Slider" data-id="num2"></div>
+                </div>
+            </div>
+
+            <div class="flex-grow-1 inputContainer">
+                <label for="num3">Vertical Number: From</label>
+                <div>
+                    <input type="number" name="num3" id="num3" required data-id="num3Slider">
+                    <label id="num3-error" class="error" for="num3"></label>
+                    <div class="num3Slider" data-id="num3"></div>
+                </div>
+                <label for="num3">to</label>
+                <div>
+                    <input type="number" name="num4" id="num4" required data-id="num4Slider">
+                    <label id="num4-error" class="error" for="num4"></label>
+                    <div class="num4Slider" data-id="num4"></div>
+                </div>
+            </div>
+        </div>
+
+    </fieldset>
+    <button onclick="handleClick(event)" class="mt-30 ui-button ui-widget ui-corner-all">Submit</button>
+
+</form>
+
+
+<table id="table" class="mt-30">
+
+</table>
+
+<div id="tabs" class="mt-30">
+    <ul></ul>
+</div>
+<button onclick="handleReset(event)" class="reset mt-30 ui-button ui-widget ui-corner-all">Reset All</button>
+
+<script>
+    var input1 = document.getElementById("num1");
+    var input2 = document.getElementById("num2");
+    var input3 = document.getElementById("num3");
+    var input4 = document.getElementById("num4");
+    var table = document.getElementById("table")
+
+    function handleClick(e) {
+        e.preventDefault();
+        if (input1.value >= input2.value || input3.value >= input4.value) {
+            alert("The next number has to be greater than the first");
+        } else if (input1.value < -50 || input1.value > 50 || input2.value < -50 || input2.value > 50 || input3.value < -50 || input3.value > 50 || input4.value < -50 || input4.value > 50) {
+            alert("Please Enter the Numbers between -50 to 50");
+        } else {
+
+            var str = "<tr><td class=\"th\"></td>";
+
+
+            for (let i = input1.value; i <= input2.value; i++) {
+
+                str += "<td class=\"th\">" + i + "</td>";
+                //var str = "<tr><td class=\"th\"></td>";
+
+
+            }
+            str += "</tr>";
+            for (let j = input3.value; j <= input4.value; j++) {
+                str += "<tr>";
+                str += "<td class=\"th\">" + j + "</td>";
+                for (let i = input1.value; i <= input2.value; i++) {
+                    str += "<td>" + (i * j) + "</td>";
+
+                }
+                str += "</tr>";
+
+            }
+            //str+="</tr>";
+            table.innerHTML = str;
+            // add tabs
+            addTabs();
+        }
+
+    }
+
+    function handleReset(e) {
+        $("#num1").val(0);
+        $("#num2").val(0);
+        $("#num3").val(0);
+        $("#num4").val(0);
+        $( '.num1Slider' ).slider( "option", "value", 0 );
+        $( '.num2Slider' ).slider( "option", "value", 0 );
+        $( '.num3Slider' ).slider( "option", "value", 0 );
+        $( '.num4Slider' ).slider( "option", "value", 0 );
+
+        $('#table').html('');
+        $(".tabs").html('<ul></ul>')
+        $(".tabs").tabs("destroy");
+        $('.reset').hide();
+    }
+
+    $.validator.addMethod('compare',
+        function (value, element, params) {
+            const targetVal = $(params.el).val();
+            if (!targetVal) return true;
+            switch (params.type) {
+                case 'less than':
+                    return value < targetVal;
+                case 'great than':
+                    return value > targetVal;
+                default:
+                    return true;
+            }
+        },
+        (param, el) => {
+            return `plz enter a number ${param.type} ${$(param.el).val()}`;
+        }
+    )
+
+    $().ready(function () {
+        init();
+
+        $('#form').validate({
+            rules: {
+                num1: {
+                    required: true,
+                    range: [-50, 50],
+                    compare: {
+                        type: 'less than',
+                        el: '#num2'
+                    }
+                },
+                num2: {
+                    required: true,
+                    range: [-50, 50],
+                    compare: {
+                        type: 'great than',
+                        el: '#num1'
+                    }
+                },
+                num3: {
+                    required: true,
+                    range: [-50, 50],
+                    compare: {
+                        type: 'less than',
+                        el: '#num4'
+                    }
+                },
+                num4: {
+                    required: true,
+                    range: [-50, 50],
+                    compare: {
+                        type: 'great than',
+                        el: '#num3'
+                    }
+                },
+            }
+        });
+
+        $('#form').change(function () {
+            $('#form').valid();
+        });
+
+        $('input[type="number"]').change(function (el) {
+            const targerEl = el.target.dataset.id;
+            $( `.${targerEl}` ).slider( "option", "value", $(el.target).val() );
+        })
+    })
+
+
+    function init() {
+        //init slider
+        const initOPtion = {
+            max: 50,
+            min: -50,
+            step: 1,
+            value: 0,
+            change: changeInputVal
+        }
+        $( ".num1Slider" ).slider(initOPtion);
+        $( ".num2Slider" ).slider(initOPtion);
+        $( ".num3Slider" ).slider(initOPtion);
+        $( ".num4Slider" ).slider(initOPtion);
+        $('.reset').hide();
+        //init tabs
+        $("#tabs").on("click", "span.ui-icon-close", function() {
+            /* remove current tab */
+            console.log(this)
+            var panelId = $(this).parent().remove().attr("aria-controls");
+            $("#" + panelId).remove();
+            $("#tabs").tabs("refresh");
+            /* remove tab list and delete all button */
+            if($("#tabs ul li").length == 0) {
+                $(".ui-tabs").tabs("destroy");
+                $('.reset').hide();
+            }
+        });
+
+    }
+
+    function changeInputVal(target, value) {
+        const targetEl = target.target.dataset;
+        $(`#${targetEl.id}`).val(value.value);
+        $('#form').valid();
+    }
+
+    function addTabs() {
+
+        const table = $('#table');
+        const tabsInstance = $( "#tabs" ).tabs('instance');
+        const tabs = $('#tabs')
+        const tabsUl = $('ul', tabs);
+        const childLen = tabsUl.children().length;
+        if (!tabsInstance) {
+            $( "#tabs" ).tabs();
+            tabsUl.append(`<li><a href="#fragment-${childLen + 1}">Tabs${childLen + 1}</a><span class='ui-icon ui-icon-close' role='presentation'></span></li>`)
+            tabs.append(`<div id="fragment-${childLen + 1}"><table>${table.html()}</table></div>`);
+        } else {
+            console.log('else');
+            tabsUl.append(`<li><a href="#fragment-${childLen + 1}">Tabs${childLen + 1}</a><span class='ui-icon ui-icon-close' role='presentation'></span></li>`)
+            tabs.append(`<div id="fragment-${childLen + 1}"><table>${table.html()}</table></div>`);
+        }
+        $( "#tabs" ).tabs( "refresh" );
+        $('#tabs').tabs("option", "active", childLen );
+        $('.reset').show();
+
+    }
+</script>
+</body>
+</html>
